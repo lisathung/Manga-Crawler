@@ -6,8 +6,10 @@ class quote_spider(scrapy.Spider):
     start_urls = ['http://quotes.toscrape.com/page/1/']
     
     def parse(self , response):
-        page = response.url.split("/")[-2]
-        filename = "quotes-%s.html"%page
-        with open (filename, 'wb') as f:
-            f.write(response.body)
+        for item in response.css('div.quote'):
+            yield{
+                'text' : item.css('span.text::text').get(),
+                'author' : item.css('small.author::text').get(),
+                'tags' : item.css('iv.tags a.tag::text').get()
+            }
         
