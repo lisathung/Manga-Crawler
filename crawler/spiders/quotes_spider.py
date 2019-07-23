@@ -5,6 +5,7 @@ class quote_spider(scrapy.Spider):
 
     start_urls = ['http://quotes.toscrape.com/page/1/']
     
+
     def parse(self , response):
         for item in response.css('div.quote'):
             yield{
@@ -12,4 +13,5 @@ class quote_spider(scrapy.Spider):
                 'author' : item.css('small.author::text').get(),
                 'tags' : item.css('iv.tags a.tag::text').get()
             }
-        
+        for a in response.css('li.next a'):
+            yield response.follow(a , callback=self.parse)        

@@ -14,6 +14,11 @@ BOT_NAME = 'crawler'
 SPIDER_MODULES = ['crawler.spiders']
 NEWSPIDER_MODULE = 'crawler.spiders'
 
+ITEM_PIPELINES = {'scrapy.pipelines.images.ImagesPipeline':1}
+IMAGES_STORE = 'output'
+FILES_STORE = 'output'
+# 90 days of delay for image expiration
+IMAGES_EXPIRES = 90
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'crawler (+http://www.yourdomain.com)'

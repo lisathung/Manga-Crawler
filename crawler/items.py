@@ -7,8 +7,8 @@
 
 import scrapy
 
-
-class CrawlerItem(scrapy.Item):
+class MangaPage(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+
+    image_urls = scrapy.Field()
