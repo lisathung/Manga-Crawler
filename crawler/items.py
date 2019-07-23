@@ -12,3 +12,6 @@ class MangaPage(scrapy.Item):
     # name = scrapy.Field()
 
     image_urls = scrapy.Field()
+    image_name = scrapy.Field()
+    manga_chapter = scrapy.Field()
+    manga_page = scrapy.Field()

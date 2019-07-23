@@ -14,9 +14,12 @@ BOT_NAME = 'crawler'
 SPIDER_MODULES = ['crawler.spiders']
 NEWSPIDER_MODULE = 'crawler.spiders'
 
-ITEM_PIPELINES = {'scrapy.pipelines.images.ImagesPipeline':1}
-IMAGES_STORE = 'output'
-FILES_STORE = 'output'
+FILES_URLS_FIELD = 'instead_of_image_urls_field_name'
+FILES_RESULT_FIELD = 'instead_of_images_field_name'
+
+ITEM_PIPELINES = {'crawler.customPipeline.CustomImageNamePipeline':1}
+IMAGES_STORE = 'j:/output'
+
 # 90 days of delay for image expiration
 IMAGES_EXPIRES = 90
 
