@@ -1,22 +1,30 @@
 import scrapy
 import re 
 from crawler.items import MangaPage
+import logging
+
+# initialize the log settings
+logging.basicConfig(filename='app.log',level=logging.INFO)
+filePointer = open('appFile','w')
 
 class image_spider(scrapy.Spider):
-
+    '''
+    the value of the 'start_urls' variable will be passed as a parameter in the main.py file 
+    '''
     name = "image_spider"
-    #replace this url with the manga you want to download
-    start_urls = ['https://mangakakalot.com/chapter/my918978/chapter_1']
     
+    #overwriting the constructor to include custom arguments
+    def __init__(self,my_url='',max_chapter_no=0,*args,**kwargs):
+        super(image_spider, self).__init__(*args, **kwargs)
+        self.start_urls = [my_url]
+        self.max_chapters = int(max_chapter_no)
+
     def parse(self,response):
         #basic parse method
         url = response.css('head link::attr(href)').extract_first()
         yield scrapy.Request(url,self.parse_chapters)
 
     def parse_chapters(self , response):
-        #set a cap on the max number of chapters you want to download
-        max_chapter = 2
-        
         #grab the image urls and yield a request to handle them
         for item in response.css('div.vung-doc img::attr(src)').extract():
             yield scrapy.Request(item, self.parse_pages)
@@ -26,8 +34,8 @@ class image_spider(scrapy.Spider):
             link = a.css('a::attr(href)').extract_first()
             current_chapter = int(re.search('(chapter_)[0-9]+' , link).group(0)[8:])
 
-            #check max chapter
-            if current_chapter <= max_chapter:
+            #set a cap on the max number of chapters you want to download
+            if current_chapter <= self.max_chapters:
                 yield response.follow(a , callback=self.parse_chapters)
             else:
                 pass
@@ -35,10 +43,14 @@ class image_spider(scrapy.Spider):
     def parse_pages(self,response):
         # grab the URL of the image
         url = response.request.url 
-        
-        #grab only the relevant bits, leave out the '/' and .jpg 
-        chapter = re.search("(/chapter_)[0-9]+", url).group(0)[1:]
-        page = re.search("[0-9]+(.jpg)", url).group(0)[:-4]
 
+        logging.debug('URL:{}'.format(url))
+        #grab only the relevant bits, leave out the '/' and .jpg 
+        chapter = re.search("[\/][\w]+(chapter)[\w]+[\/]", url).group(0).replace('/','')
+        page = re.search("[0-9]+(.jpg)", url).group(0)[:-4]
+   
         #yield the result
         yield MangaPage(image_urls=[url] , manga_chapter=chapter , manga_page=page)
+
+
+filePointer.close()
