@@ -21,7 +21,10 @@ class image_spider(scrapy.Spider):
 
     def parse(self,response):
         #basic parse method
-        url = response.css('head link::attr(href)').extract_first()
+        
+        url = response.css("head meta[property='og:url']::attr(content)").extract_first()
+         
+        logging.debug('requestURL:{}'.format(url))
         yield scrapy.Request(url,self.parse_chapters)
 
     def parse_chapters(self , response):
@@ -34,7 +37,7 @@ class image_spider(scrapy.Spider):
             link = a.css('a::attr(href)').extract_first()
             current_chapter = int(re.search('(chapter_)[0-9]+' , link).group(0)[8:])
 
-            #set a cap on the max number of chapters you want to download
+            #set a cap on the number of chapters you want to download
             if current_chapter <= self.max_chapters:
                 yield response.follow(a , callback=self.parse_chapters)
             else:
@@ -46,11 +49,10 @@ class image_spider(scrapy.Spider):
 
         logging.debug('URL:{}'.format(url))
         #grab only the relevant bits, leave out the '/' and .jpg 
-        chapter = re.search("[\/][\w]+(chapter)[\w]+[\/]", url).group(0).replace('/','')
+        chapter = re.search("[\/][\w]*(chapter)[\w]+[\/]", url).group(0).replace('/','')
         page = re.search("[0-9]+(.jpg)", url).group(0)[:-4]
    
         #yield the result
         yield MangaPage(image_urls=[url] , manga_chapter=chapter , manga_page=page)
-
 
 filePointer.close()
