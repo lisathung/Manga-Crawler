@@ -21,7 +21,6 @@ class image_spider(scrapy.Spider):
 
     def parse(self,response):
         #basic parse method
-        
         url = response.css("head meta[property='og:url']::attr(content)").extract_first()
          
         logging.debug('requestURL:{}'.format(url))

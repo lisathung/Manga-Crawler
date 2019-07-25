@@ -14,10 +14,10 @@ BOT_NAME = 'crawler'
 SPIDER_MODULES = ['crawler.spiders']
 NEWSPIDER_MODULE = 'crawler.spiders'
 
-FILES_URLS_FIELD = 'instead_of_image_urls_field_name'
-FILES_RESULT_FIELD = 'instead_of_images_field_name'
-
+#use the custom pipeline that was made 
 ITEM_PIPELINES = {'crawler.customPipeline.CustomImageNamePipeline':1}
+
+#file location for storing downloaded files
 IMAGES_STORE = 'j:/output'
 
 # 90 days of delay for image expiration
