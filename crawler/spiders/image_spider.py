@@ -23,30 +23,43 @@ class image_spider(scrapy.Spider):
         #basic parse method
         url = response.css("head meta[property='og:url']::attr(content)").extract_first()
          
-        logging.debug('requestURL:{}'.format(url))
+        # logging.debug('requestURL:{}'.format(url))
         yield scrapy.Request(url,self.parse_chapters)
 
     def parse_chapters(self , response):
-        #grab the image urls and yield a request to handle them
-        for item in response.css('div.vung-doc img::attr(src)').extract():
+        # #grab the image urls and yield a request to handle them(DOMEKANO)
+        # for item in response.css('div.vung-doc img::attr(src)').extract():
+        #     yield scrapy.Request(item, self.parse_pages)
+        
+        #grab the image urls and yield a request to handle them(A TOWN WHERE YOU LIVE)
+        for item in response.css('div.container-chapter-reader img::attr(src)').extract():
             yield scrapy.Request(item, self.parse_pages)
         
-        #Extract link to next chapter and visit it
-        for a in response.css('div.option_wrap a'):
-            link = a.css('a::attr(href)').extract_first()
-            current_chapter = int(re.search('(chapter_)[0-9]+' , link).group(0)[8:])
-
-            #set a cap on the number of chapters you want to download
-            if current_chapter <= self.max_chapters:
-                yield response.follow(a , callback=self.parse_chapters)
-            else:
-                pass
+        # #Extract link to next chapter and visit it (DOMEKANO)
+        # for a in response.css('div.option_wrap a'):
+            # link = a.css('a::attr(href)').extract_first()
+            # current_chapter = int(re.search('(chapter_)[0-9]+' , link).group(0)[8:])
+            
+            # #set a cap on the number of chapters you want to download
+            # if current_chapter <= self.max_chapters:
+            #     yield response.follow(link, callback=self.parse_chapters)
+            # else:
+            #     pass
         
+        #Extract link to next chapter and visit it (ATOWNWHEREYOULIVE)
+        link = response.css('div.navi-change-chapter-btn a::attr(href)').extract()[-1]
+        current_chapter = int(re.search('(chapter_)[0-9]+' , link).group(0)[8:])    
+        #set a cap on the number of chapters you want to download
+        if current_chapter <= self.max_chapters:
+            yield response.follow(link, callback=self.parse_chapters)
+        else:
+            pass
+    
     def parse_pages(self,response):
         # grab the URL of the image
         url = response.request.url 
 
-        logging.debug('URL:{}'.format(url))
+        # logging.debug('URL:{}'.format(url))
         #grab only the relevant bits, leave out the '/' and .jpg 
         chapter = re.search("[\/][\w]*(chapter)[\w]+[\/]", url).group(0).replace('/','')
         page = re.search("[0-9]+(.jpg)", url).group(0)[:-4]
