@@ -12,7 +12,7 @@ from scrapy.utils.project import get_project_settings
 start_url = str(input("Enter start url of the format https://mangakakalot.com/chapter/my918978/chapter_1\n"))
 max_chapters = int(input('Enter the maximum numeber of chapters you want to download. Cannot be less than 1\n'))
 
-# https://manganelo.com/chapter/read_kimi_no_iru_machi/chapter_1
+# https://www.readm.org/manga/3041/1/all-pages
 
 process = CrawlerProcess(get_project_settings())
 process.crawl(image_spider, my_url=start_url, max_chapter_no=max_chapters )
